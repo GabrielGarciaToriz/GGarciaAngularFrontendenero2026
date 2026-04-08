@@ -1,5 +1,7 @@
+import { PaisModel } from "./PaisModel";
+
 export interface EstadoModel{
     idEstado : number;
     nombre : string;
-    idPais: number;
+    pais: PaisModel;
 }

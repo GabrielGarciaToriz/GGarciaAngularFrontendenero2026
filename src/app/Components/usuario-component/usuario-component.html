@@ -1,0 +1,124 @@
+<div class="container mt-4">
+    <h1 class="mb-4">Lista de Usuarios</h1>
+    @if (mensajeError) {
+    <div class="alert alert-danger" role="alert">
+        {{ mensajeError }}
+    </div>
+    }
+
+    <div class="row">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light text-secondary small text-uppercase">
+                        <tr>
+                            <th class="ps-4">Usuario</th>
+                            <th class="text-center">Contacto</th>
+                            <th class="text-center">Direcciones Registradas</th>
+                            <th class="text-center">Estatus</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @for(usuario of usuarios; track usuario.idUsuario) {
+                        <tr>
+                            <td class="ps-4 align-middle">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="avatar-circle me-3 flex-shrink-0">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ usuario.nombre+' '+usuario.apellidoPaterno+'
+                                            '+usuario.apellidoMaterno }}</div>
+                                        <div class="small text-muted">
+                                            <span class="fw-medium text-secondary">{{ usuario.userName}}</span>
+                                            <span
+                                                class="badge badge-soft-success rounded-pill">{{usuario.rol.idRol}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="small text-muted mt-2 ps-1">
+                                    <div class="mb-1">
+                                        <i class="bi bi-upc-scan me-1"></i>
+                                        <span>{{ usuario.curp }}</span>
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        <span>{{ usuario.fechaNacimiento }}</span>
+                                        (<span>{{usuario.sexo}}</span>)
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <ul class="list-unstyled mb-0 small text-secondary">
+                                    <li class="mb-2">
+                                        <i class="bi bi-envelope-at text-danger me-2"></i>
+                                        <a href="#" class="text-decoration-none text-secondary">{{ usuario.email }}</a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-telephone text-primary me-2"></i>
+                                        <span>{{usuario.telefono}}</span>
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-phone text-success me-2"></i>
+                                        <span>{{usuario.celular}}</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td class="align-middle">
+                                @for(direccion of usuario.direcciones; track direccion.idDireccion) {
+                                <div class="fw-bold text-dark mb-1">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                    <span>Calle: {{direccion.calle}} Ext. {{direccion.numeroExterior}}</span>
+                                    @if(direccion.numeroInterior != null) {
+                                    <span> Int. {{direccion.numeroInterior}}</span>
+                                    }@else {
+                                    <span>Sin numero interior</span>
+                                    }
+                                </div>
+                                <div class="text-secondary ms-3">
+                                    @if(direccion.colonia.nombre != null){
+                                    <div>
+                                        <i class="bi bi-geo text-secondary me-1"></i>
+                                        Col. {{direccion.colonia.nombre}},
+                                        {{direccion.colonia.municipio.nombre}}
+                                    </div>
+                                    <div class="text-muted">
+                                        <span>
+                                            {{direccion.colonia.municipio.estado.nombre}},
+                                            {{direccion.colonia.municipio.estado.pais.nombre}}
+                                        </span>
+                                    </div>
+                                    }
+                                </div>
+                                }
+                            </td>
+                            <td class="text-center align-middle">
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                </div>
+                            </td>
+                            <td class="text-center pe-4 align-middle">
+                                <div class="btn-group shadow-sm">
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">
+                                         <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+
+                        </tr>
+
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,17 +1,21 @@
+import { RolModel } from "../Catalogos/RolModel";
+import { DireccionModel } from "../Direccion/DireccionModel";
+
 export interface UsuarioModel {
-    id: number;
+    idUsuario: number;
     nombre: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
-    fechaNacimiento: Date;
     celular: string;
     curp: string;
-    username: string;
+    userName: string;
     email: string;
     password: string;
     sexo: string;
     telefono: string;
-    idRol: number;
+    fechaNacimiento: string;
     estatus: number;
     imagen: string;
+    rol: RolModel;
+    direcciones? :DireccionModel[];
 }

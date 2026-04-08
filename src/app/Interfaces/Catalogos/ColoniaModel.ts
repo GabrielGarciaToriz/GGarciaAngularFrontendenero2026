@@ -1,5 +1,8 @@
+import { MunicipioModel } from "./MunicipioModel";
+
 export interface ColoniaModel{
     idColonia: number;
     nombre : string;
-    idMunicipio: number;
+    codigoPostal: string;
+    municipio: MunicipioModel;
 }

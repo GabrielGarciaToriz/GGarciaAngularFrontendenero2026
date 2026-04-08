@@ -1,5 +1,7 @@
+import { EstadoModel } from "./EstadoModel";
+
 export interface MunicipioModel{
     idMunicipio: number;
     nombre: string;
-    idEstado: number;
+    estado: EstadoModel;
 }
