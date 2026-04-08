@@ -1,0 +1,17 @@
+<div class="container mt-4">
+    <h2 class="mb-4">Detalles de usuario</h2>
+    @if(mensajeError){
+    <div class="alert alert-danger" role="alert">
+        {{ mensajeError }}
+    </div>
+    }
+
+    <div class="row">
+        <div class="card-body p-0">
+            @for(detalle of usuario; track detalle.idUsuario) {
+            <div class="d-flex align-items-center mb-4">
+            </div>
+            }
+        </div>
+    </div>
+</div>

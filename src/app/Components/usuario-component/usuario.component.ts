@@ -36,16 +36,4 @@ export class UsuarioComponent implements OnInit {
             }
         });
     }
-     getAllById(id: number){
-        this.usuarioService.getUsuarioById(id).subscribe({
-            next:(respuesta)=>{
-                if(respuesta.correct){
-                    this.usuarios = respuesta.objects || [];
-                    console.log(respuesta.objects)
-                }
-            }
-        })
-     }
-    
-
 }
