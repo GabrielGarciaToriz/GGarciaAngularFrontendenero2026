@@ -7,16 +7,20 @@ import { Result } from "../Interfaces/Entity/Result";
 @Injectable({
     providedIn: 'root'
 })
- export class UsuarioService{
+export class UsuarioService {
     private apiUrl = 'http://localhost:8081/api/usuario';
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     getUsuarios(): Observable<Result<UsuarioModel>> {
         return this.http.get<Result<UsuarioModel>>(this.apiUrl);
     }
-    cambiarEstado(id:number, estadoActual: boolean): Observable<Result<UsuarioModel>>{
-        const payload = {activo : estadoActual};
+    getUsuarioById(id: number): Observable<Result<UsuarioModel>> {
+        return this.http.get<Result<UsuarioModel>>(`${this.apiUrl}/${id}`);
+    }
+
+    cambiarEstado(id: number, estadoActual: boolean): Observable<Result<UsuarioModel>> {
+        const payload = { activo: estadoActual };
         return this.http.put<Result<UsuarioModel>>(`${this.apiUrl}/cambioStatus/${id}/`, payload);
     }
- }
+}

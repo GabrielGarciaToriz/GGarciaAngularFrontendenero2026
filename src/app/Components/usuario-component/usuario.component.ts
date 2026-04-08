@@ -9,8 +9,8 @@ import { UsuarioService } from "../../Services/usuario.service";
     selector: 'app-usuario-component',
     standalone: true,
     imports: [CommonModule],
-    templateUrl: './usuario-component.html',
-    styleUrl: './usuario-component.css'
+    templateUrl: './usuario.component.html',
+    styleUrl: './usuario.component.css'
 })
 export class UsuarioComponent implements OnInit {
     usuarios: UsuarioModel[] = [];
@@ -36,6 +36,16 @@ export class UsuarioComponent implements OnInit {
             }
         });
     }
+     getAllById(id: number){
+        this.usuarioService.getUsuarioById(id).subscribe({
+            next:(respuesta)=>{
+                if(respuesta.correct){
+                    this.usuarios = respuesta.objects || [];
+                    console.log(respuesta.objects)
+                }
+            }
+        })
+     }
     
 
 }
