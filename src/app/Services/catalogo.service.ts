@@ -32,6 +32,8 @@ export class catalogoService {
     getColonias(idMunicipio: number): Observable<Result<ColoniaModel>> {
         return this.http.get<Result<ColoniaModel>>(API_ROUTES.catalogos.colonia.replace(':idMunicipio', idMunicipio.toString()));
     }
-
+    getByCodigoPostal(codigoPostal: string): Observable<Result<ColoniaModel>> {
+        return this.http.get<Result<ColoniaModel>>(API_ROUTES.catalogos.codigoPostal.replace(':codigoPostal', codigoPostal));
+    }
 
 }

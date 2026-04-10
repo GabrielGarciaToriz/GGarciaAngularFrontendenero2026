@@ -10,7 +10,8 @@ export const API_ROUTES = {
         pais: `${API_BASE_URL}/pais`,
         estado: `${API_BASE_URL}/estado/:idPais`,
         municipio: `${API_BASE_URL}/municipio/:idEstado`,
-        colonia: `${API_BASE_URL}/colonia/:idMunicipio`
+        colonia: `${API_BASE_URL}/colonia/:idMunicipio`,
+        codigoPostal: `${API_BASE_URL}/colonia/codigoPostal/:codigoPostal`
     },
     usuario: {
         base: `${API_BASE_URL}/usuario`,

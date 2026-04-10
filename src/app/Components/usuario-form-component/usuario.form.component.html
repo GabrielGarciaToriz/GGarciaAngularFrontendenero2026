@@ -1,115 +1,289 @@
 <div class="container d-flex justify-content-center p-4">
-    <div class="col-12 col-lg-12">
+  <div class="col-12 col-lg-12">
 
-        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-primary text-white text-center py-4 border-0">
-                <h3 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>Registrar Usuario</h3>
-                <p class="mb-0 text-white-50 small">Completa los datos para crear una nueva cuenta</p>
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+      <!-- Encabezado -->
+      <div class="card-header bg-primary text-white text-center py-4 border-0">
+        <h3 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>Registrar Usuario</h3>
+        <p class="mb-0 text-white-50 small">Completa los datos para crear una nueva cuenta</p>
+      </div>
+
+      <div class="card-body p-4 p-md-5">
+        <form [formGroup]="form" (ngSubmit)="enviarDatos()">
+
+          <!-- ══════════════════════════════════════════
+               SECCIÓN 1 — Datos de la Cuenta
+          ══════════════════════════════════════════ -->
+          <h5 class="form-section-title mt-0">
+            <i class="bi bi-shield-lock me-2"></i>Datos de la Cuenta
+          </h5>
+
+          <div class="row g-3 mb-4">
+
+            <div class="col-md-3">
+              <label for="userName" class="form-label">Usuario <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="userName"
+                     formControlName="userName" placeholder="ej. gabriel99"
+                     [class.is-invalid]="isInvalid('userName')">
+              <div class="invalid-feedback">El usuario es requerido.</div>
             </div>
-        </div>
-        <div class="card-body p-4 p-md-5">
-            <form [formGroup]="form" (submit)="enviarDatos()">
-                <h5 class="form-section-title mt-0"><i class="bi bi-shield-lock me-2"></i>Datos de la Cuenta</h5>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3">
-                        <label for="" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" placeholder="Usuario">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="" class="form-label">Correo electronico</label>
-                        <input type="text" class="form-control" placeholder="Correo electronico">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" placeholder="Contraseña">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="rol" class="form-label">Rol</label>
-                        <select name="rol" id="rol" class="form-select">
-                            <option value="0">Seleccione un rol</option>
-                            @for(rol of roles; track rol.idRol){
-                            <option value="{{rol.idRol}}">{{rol.nombre}}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <h5 class="form-section-title mt-0"><i class="bi bi-person-lines-fill me-2"></i>Información general</h5>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <label for="nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="nombre" formControlName="nombre"
-                            placeholder="Gabriel">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
-                        <input type="text" class="form-control" id="apellidoPaterno" formControlName="apellidoPaterno"
-                            placeholder="Garcia">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
-                        <input type="text" class="form-control" id="apellidoMaterno" formControlName="apellidoMaterno"
-                            placeholder="Gonzalez">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
-                        <input type="date" class="form-control" id="fechaNacimiento" formControlName="fechaNacimiento">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="curp" class="form-label">CURP</label>
-                        <input type="text" class="form-control" id="curp" formControlName="curp"
-                            placeholder="GATGXXXXXXHDFRRBA0">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="sexo" class="form-label d-block">Sexo</label>
-                        <div class="form-check form-check-inline mt-2">
-                            <label for="rbHombre" class="form-check-label">Hombre</label>
-                            <input type="radio" name="rbHombre" id="rbHombre" value="M" class="form-check-input">
-                        </div>
-                        <div class="form-check form-check-inline mt-2">
-                            <label for="rbMujer" class="form-check-label">Mujer</label>
-                            <input type="radio" name="rbMujer" id="rbMujer" value="F" class="form-check-input">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="celular" class="form-label">Celular</label>
-                        <input type="text" class="form-control" id="celular" formControlName="celular">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="telefono" class="form-label">Telefono Fijo</label>
-                        <input type="text" class="form-control" id="telefono" formControlName="telefono">
-                    </div>
-                </div>
-                <h5 class="form-section-title"><i class="bi bi-geo-alt me-2"></i>Dirección</h5>
-                <div class="row g-3 mb-4" formGroupName="direcciones">
-                    <div class="col-md-4">
-                        <label for="calle" class="form-label">Calle</label>
-                        <input type="text" class="form-control" id="calle" formControlName="calle"
-                            placeholder="Av. Principal">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="numeroExterior" class="form-label">Numero exterior</label>
-                        <input type="text" class="form-control" id="numeroExterior" formControlName="numeroExterior"
-                            placeholder="Ej: 1001">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="numeroExterior" class="form-label">Numero exterior</label>
-                        <input type="text" class="form-control" id="numeroExterior" formControlName="numeroExterior"
-                            placeholder="Ej: 1001">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="codigoPostal" class="form-label">Codigo Postal</label>
-                        <input type="text" class="form-control" id="codigoPostal" formControlName="codigoPostal"
-                            placeholder="Ej: 1001">
-                    </div>
 
-                </div>
+            <div class="col-md-3">
+              <label for="email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="email"
+                     formControlName="email" placeholder="correo@ejemplo.com"
+                     [class.is-invalid]="isInvalid('email')">
+              <div class="invalid-feedback">Ingresa un correo válido.</div>
+            </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">Crear Cuenta</button>
-                </div>
-            </form>
-        </div>
+            <div class="col-md-3">
+              <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" id="password"
+                     formControlName="password" placeholder="Mín. 6 caracteres"
+                     [class.is-invalid]="isInvalid('password')">
+              <div class="invalid-feedback">Mínimo 6 caracteres.</div>
+            </div>
 
+            <div class="col-md-3">
+              <label for="idRol" class="form-label">Rol <span class="text-danger">*</span></label>
+              <select id="idRol" class="form-select" formControlName="idRol"
+                      [class.is-invalid]="isInvalid('idRol')">
+                <option [ngValue]="null" disabled>Selecciona un rol</option>
+                @for (rol of roles; track rol.idRol) {
+                  <option [ngValue]="rol.idRol">{{ rol.nombre }}</option>
+                }
+              </select>
+              <div class="invalid-feedback">Selecciona un rol.</div>
+            </div>
 
-    </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+               SECCIÓN 2 — Información General
+          ══════════════════════════════════════════ -->
+          <h5 class="form-section-title">
+            <i class="bi bi-person-lines-fill me-2"></i>Información general
+          </h5>
+
+          <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+              <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nombre"
+                     formControlName="nombre" placeholder="Gabriel"
+                     [class.is-invalid]="isInvalid('nombre')">
+              <div class="invalid-feedback">El nombre es requerido.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="apellidoPaterno" class="form-label">Apellido Paterno <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="apellidoPaterno"
+                     formControlName="apellidoPaterno" placeholder="García"
+                     [class.is-invalid]="isInvalid('apellidoPaterno')">
+              <div class="invalid-feedback">El apellido paterno es requerido.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+              <input type="text" class="form-control" id="apellidoMaterno"
+                     formControlName="apellidoMaterno" placeholder="González">
+            </div>
+
+            <div class="col-md-4">
+              <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" id="fechaNacimiento"
+                     formControlName="fechaNacimiento"
+                     [class.is-invalid]="isInvalid('fechaNacimiento')">
+              <div class="invalid-feedback">La fecha de nacimiento es requerida.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="curp" class="form-label">CURP <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="curp"
+                     formControlName="curp" placeholder="GAGG990101HDFRRB09"
+                     maxlength="18" style="text-transform:uppercase"
+                     [class.is-invalid]="isInvalid('curp')">
+              <div class="invalid-feedback">La CURP debe tener 18 caracteres.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label d-block">Sexo <span class="text-danger">*</span></label>
+              <div class="form-check form-check-inline mt-2">
+                <input type="radio" class="form-check-input" id="rbHombre"
+                       formControlName="sexo" value="M">
+                <label class="form-check-label" for="rbHombre">Hombre</label>
+              </div>
+              <div class="form-check form-check-inline mt-2">
+                <input type="radio" class="form-check-input" id="rbMujer"
+                       formControlName="sexo" value="F">
+                <label class="form-check-label" for="rbMujer">Mujer</label>
+              </div>
+              @if (isInvalid('sexo')) {
+                <div class="text-danger small mt-1">Selecciona el sexo.</div>
+              }
+            </div>
+
+            <div class="col-md-4">
+              <label for="celular" class="form-label">Celular</label>
+              <input type="tel" class="form-control" id="celular"
+                     formControlName="celular" placeholder="55 1234 5678">
+            </div>
+
+            <div class="col-md-4">
+              <label for="telefono" class="form-label">Teléfono Fijo</label>
+              <input type="tel" class="form-control" id="telefono"
+                     formControlName="telefono" placeholder="55 1234 5678">
+            </div>
+
+          </div>
+
+          <!-- ══════════════════════════════════════════
+               SECCIÓN 3 — Dirección (FormArray)
+          ══════════════════════════════════════════ -->
+          <h5 class="form-section-title">
+            <i class="bi bi-geo-alt me-2"></i>Dirección
+          </h5>
+
+          <div formArrayName="direcciones">
+            @for (dir of direccionesArray.controls; track $index) {
+              <div [formGroupName]="$index" class="border rounded-3 p-3 mb-3 bg-light">
+
+                <div class="row g-3">
+
+                  <!-- ── Código Postal (trigger de la cascada) ── -->
+                  <div class="col-md-3">
+                    <label [for]="'cp_'+$index" class="form-label">
+                      Código Postal <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <!-- Spinner mientras busca, ícono de mapa si está tranquilo -->
+                        @if (cpBuscando[$index]) {
+                          <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                        } @else {
+                          <i class="bi bi-search"></i>
+                        }
+                      </span>
+                      <input type="text" class="form-control" [id]="'cp_'+$index"
+                             formControlName="codigoPostal"
+                             placeholder="Ej: 06600" maxlength="5"
+                             [class.is-invalid]="isInvalidDir($index, 'codigoPostal')">
+                      <div class="invalid-feedback">Ingresa un CP válido de 5 dígitos.</div>
+                    </div>
+                    <!-- Mensaje de error de búsqueda -->
+                    @if (cpError[$index]) {
+                      <div class="text-danger small mt-1">
+                        <i class="bi bi-exclamation-circle me-1"></i>{{ cpError[$index] }}
+                      </div>
+                    }
+                    <div class="form-text">Se auto-rellenan país, estado y municipio.</div>
+                  </div>
+
+                  <!-- ── País (solo lectura, auto-rellenado) ── -->
+                  <div class="col-md-3">
+                    <label [for]="'pais_'+$index" class="form-label">País</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary-subtle">
+                        <i class="bi bi-globe2"></i>
+                      </span>
+                      <input type="text" class="form-control bg-secondary-subtle" [id]="'pais_'+$index"
+                             formControlName="pais" readonly placeholder="Se completa automáticamente">
+                    </div>
+                  </div>
+
+                  <!-- ── Estado (solo lectura, auto-rellenado) ── -->
+                  <div class="col-md-3">
+                    <label [for]="'estado_'+$index" class="form-label">Estado</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary-subtle">
+                        <i class="bi bi-map"></i>
+                      </span>
+                      <input type="text" class="form-control bg-secondary-subtle" [id]="'estado_'+$index"
+                             formControlName="estado" readonly placeholder="Se completa automáticamente">
+                    </div>
+                  </div>
+
+                  <!-- ── Municipio (solo lectura, auto-rellenado) ── -->
+                  <div class="col-md-3">
+                    <label [for]="'municipio_'+$index" class="form-label">Municipio / Alcaldía</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary-subtle">
+                        <i class="bi bi-building"></i>
+                      </span>
+                      <input type="text" class="form-control bg-secondary-subtle" [id]="'municipio_'+$index"
+                             formControlName="municipio" readonly placeholder="Se completa automáticamente">
+                    </div>
+                  </div>
+
+                  <!-- ── Colonia (select habilitado tras buscar CP) ── -->
+                  <div class="col-md-4">
+                    <label [for]="'colonia_'+$index" class="form-label">
+                      Colonia <span class="text-danger">*</span>
+                    </label>
+                    <select [id]="'colonia_'+$index" class="form-select"
+                            formControlName="idColonia"
+                            [class.is-invalid]="isInvalidDir($index, 'idColonia')">
+                      <option [ngValue]="null" disabled>
+                        {{ getColoniasDir($index).length === 0 ? 'Ingresa el código postal' : 'Selecciona colonia' }}
+                      </option>
+                      @for (c of getColoniasDir($index); track c.idColonia) {
+                        <option [ngValue]="c.idColonia">{{ c.nombre }}</option>
+                      }
+                    </select>
+                    <div class="invalid-feedback">Selecciona la colonia.</div>
+                  </div>
+
+                  <!-- ── Calle ── -->
+                  <div class="col-md-4">
+                    <label [for]="'calle_'+$index" class="form-label">Calle <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" [id]="'calle_'+$index"
+                           formControlName="calle" placeholder="Av. Insurgentes"
+                           [class.is-invalid]="isInvalidDir($index, 'calle')">
+                    <div class="invalid-feedback">La calle es requerida.</div>
+                  </div>
+
+                  <!-- ── Número Exterior ── -->
+                  <div class="col-md-2">
+                    <label [for]="'numExt_'+$index" class="form-label">Núm. Ext. <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" [id]="'numExt_'+$index"
+                           formControlName="numeroExterior" placeholder="123"
+                           [class.is-invalid]="isInvalidDir($index, 'numeroExterior')">
+                    <div class="invalid-feedback">Requerido.</div>
+                  </div>
+
+                  <!-- ── Número Interior ── -->
+                  <div class="col-md-2">
+                    <label [for]="'numInt_'+$index" class="form-label">Núm. Int.</label>
+                    <input type="text" class="form-control" [id]="'numInt_'+$index"
+                           formControlName="numeroInterior" placeholder="Depto 3B">
+                  </div>
+
+                </div><!-- /row -->
+              </div><!-- /formGroupName -->
+            }
+          </div><!-- /formArrayName -->
+
+          <!-- Error general -->
+          @if (mensajeError) {
+            <div class="alert alert-danger mt-3" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ mensajeError }}
+            </div>
+          }
+
+          <!-- Submit -->
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" [disabled]="cargando">
+              @if (cargando) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>Cargando...
+              } @else {
+                <i class="bi bi-person-check-fill me-2"></i>Crear Cuenta
+              }
+            </button>
+          </div>
+
+        </form>
+      </div><!-- /card-body -->
+    </div><!-- /card -->
+  </div>
 </div>
