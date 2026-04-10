@@ -23,4 +23,8 @@ export class UsuarioService {
         const payload = { activo: estadoActual };
         return this.http.put<Result<UsuarioModel>>(`${this.apiUrl}/cambioStatus/${id}/`, payload);
     }
+
+    addUsuario(usuario: UsuarioModel): Observable<Result<UsuarioModel>> {
+        return this.http.post<Result<UsuarioModel>>(this.apiUrl, usuario);
+    }
 }
