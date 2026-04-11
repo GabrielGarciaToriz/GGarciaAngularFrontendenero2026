@@ -31,7 +31,6 @@ export class FormComponent implements OnInit, OnDestroy {
     mensajeError: string = '';
     cargando: boolean = true;
 
-    // Estado de búsqueda por CP — un slot por cada dirección en el array
     cpBuscando: boolean[] = [false];
     cpError: string[] = [''];
 
@@ -234,7 +233,6 @@ export class FormComponent implements OnInit, OnDestroy {
             });
     }
 
-    // ─── Helpers validación ───────────────────────────────────────────────────
     isInvalid(campo: string): boolean {
         const c = this.form.get(campo);
         return !!(c?.invalid && c?.touched);
