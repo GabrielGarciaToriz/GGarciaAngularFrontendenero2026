@@ -13,8 +13,6 @@ import { API_ROUTES } from "../app.routes";
 })
 
 export class catalogoService {
-    private catalogoRol = API_ROUTES.catalogos.rol;
-
     constructor(private http: HttpClient) { }
 
     getRoles(): Observable<Result<RolModel>> {
@@ -33,7 +31,7 @@ export class catalogoService {
         return this.http.get<Result<ColoniaModel>>(API_ROUTES.catalogos.colonia.replace(':idMunicipio', idMunicipio.toString()));
     }
     getByCodigoPostal(codigoPostal: string): Observable<Result<ColoniaModel>> {
-        return this.http.get<Result<ColoniaModel>>(API_ROUTES.catalogos.codigoPostal.replace(':codigoPostal', codigoPostal));
+        return this.http.get<Result<ColoniaModel>>(API_ROUTES.catalogos.codigoPostal.replace(':codigoPostal', codigoPostal.toString));
     }
 
 }

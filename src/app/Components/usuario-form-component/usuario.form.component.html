@@ -141,7 +141,9 @@
           <!-- ══════════════════════════════════════════
                SECCIÓN 3 — Dirección (FormArray)
           ══════════════════════════════════════════ -->
-          <h5 class="form-section-title">
+         
+
+         <h5 class="form-section-title">
             <i class="bi bi-geo-alt me-2"></i>Dirección
           </h5>
 
@@ -151,14 +153,12 @@
 
                 <div class="row g-3">
 
-                  <!-- ── Código Postal (trigger de la cascada) ── -->
                   <div class="col-md-3">
                     <label [for]="'cp_'+$index" class="form-label">
                       Código Postal <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
                       <span class="input-group-text">
-                        <!-- Spinner mientras busca, ícono de mapa si está tranquilo -->
                         @if (cpBuscando[$index]) {
                           <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
                         } @else {
@@ -171,52 +171,56 @@
                              [class.is-invalid]="isInvalidDir($index, 'codigoPostal')">
                       <div class="invalid-feedback">Ingresa un CP válido de 5 dígitos.</div>
                     </div>
-                    <!-- Mensaje de error de búsqueda -->
                     @if (cpError[$index]) {
                       <div class="text-danger small mt-1">
                         <i class="bi bi-exclamation-circle me-1"></i>{{ cpError[$index] }}
                       </div>
                     }
-                    <div class="form-text">Se auto-rellenan país, estado y municipio.</div>
+                    <div class="form-text">Búscalo o usa las listas inferiores.</div>
                   </div>
 
-                  <!-- ── País (solo lectura, auto-rellenado) ── -->
                   <div class="col-md-3">
-                    <label [for]="'pais_'+$index" class="form-label">País</label>
+                    <label [for]="'pais_'+$index" class="form-label">País <span class="text-danger">*</span></label>
                     <div class="input-group">
-                      <span class="input-group-text bg-secondary-subtle">
-                        <i class="bi bi-globe2"></i>
-                      </span>
-                      <input type="text" class="form-control bg-secondary-subtle" [id]="'pais_'+$index"
-                             formControlName="pais" readonly placeholder="Se completa automáticamente">
+                      <span class="input-group-text"><i class="bi bi-globe2"></i></span>
+                      <select class="form-select" [id]="'pais_'+$index" formControlName="idPais"
+                              [class.is-invalid]="isInvalidDir($index, 'idPais')">
+                        <option [ngValue]="null" disabled>Selecciona el país</option>
+                        @for (p of paises; track p.idPais) {
+                          <option [ngValue]="p.idPais">{{ p.nombre }}</option>
+                        }
+                      </select>
                     </div>
                   </div>
 
-                  <!-- ── Estado (solo lectura, auto-rellenado) ── -->
                   <div class="col-md-3">
-                    <label [for]="'estado_'+$index" class="form-label">Estado</label>
+                    <label [for]="'estado_'+$index" class="form-label">Estado <span class="text-danger">*</span></label>
                     <div class="input-group">
-                      <span class="input-group-text bg-secondary-subtle">
-                        <i class="bi bi-map"></i>
-                      </span>
-                      <input type="text" class="form-control bg-secondary-subtle" [id]="'estado_'+$index"
-                             formControlName="estado" readonly placeholder="Se completa automáticamente">
+                      <span class="input-group-text"><i class="bi bi-map"></i></span>
+                      <select class="form-select" [id]="'estado_'+$index" formControlName="idEstado"
+                              [class.is-invalid]="isInvalidDir($index, 'idEstado')">
+                        <option [ngValue]="null" disabled>Selecciona el estado</option>
+                        @for (e of getEstadosDir($index); track e.idEstado) {
+                          <option [ngValue]="e.idEstado">{{ e.nombre }}</option>
+                        }
+                      </select>
                     </div>
                   </div>
 
-                  <!-- ── Municipio (solo lectura, auto-rellenado) ── -->
                   <div class="col-md-3">
-                    <label [for]="'municipio_'+$index" class="form-label">Municipio / Alcaldía</label>
+                    <label [for]="'municipio_'+$index" class="form-label">Municipio <span class="text-danger">*</span></label>
                     <div class="input-group">
-                      <span class="input-group-text bg-secondary-subtle">
-                        <i class="bi bi-building"></i>
-                      </span>
-                      <input type="text" class="form-control bg-secondary-subtle" [id]="'municipio_'+$index"
-                             formControlName="municipio" readonly placeholder="Se completa automáticamente">
+                      <span class="input-group-text"><i class="bi bi-building"></i></span>
+                      <select class="form-select" [id]="'municipio_'+$index" formControlName="idMunicipio"
+                              [class.is-invalid]="isInvalidDir($index, 'idMunicipio')">
+                        <option [ngValue]="null" disabled>Selecciona municipio</option>
+                        @for (m of getMunicipiosDir($index); track m.idMunicipio) {
+                          <option [ngValue]="m.idMunicipio">{{ m.nombre }}</option>
+                        }
+                      </select>
                     </div>
                   </div>
 
-                  <!-- ── Colonia (select habilitado tras buscar CP) ── -->
                   <div class="col-md-4">
                     <label [for]="'colonia_'+$index" class="form-label">
                       Colonia <span class="text-danger">*</span>
@@ -224,9 +228,7 @@
                     <select [id]="'colonia_'+$index" class="form-select"
                             formControlName="idColonia"
                             [class.is-invalid]="isInvalidDir($index, 'idColonia')">
-                      <option [ngValue]="null" disabled>
-                        {{ getColoniasDir($index).length === 0 ? 'Ingresa el código postal' : 'Selecciona colonia' }}
-                      </option>
+                      <option [ngValue]="null" disabled>Selecciona colonia</option>
                       @for (c of getColoniasDir($index); track c.idColonia) {
                         <option [ngValue]="c.idColonia">{{ c.nombre }}</option>
                       }
@@ -234,7 +236,6 @@
                     <div class="invalid-feedback">Selecciona la colonia.</div>
                   </div>
 
-                  <!-- ── Calle ── -->
                   <div class="col-md-4">
                     <label [for]="'calle_'+$index" class="form-label">Calle <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" [id]="'calle_'+$index"
@@ -243,7 +244,6 @@
                     <div class="invalid-feedback">La calle es requerida.</div>
                   </div>
 
-                  <!-- ── Número Exterior ── -->
                   <div class="col-md-2">
                     <label [for]="'numExt_'+$index" class="form-label">Núm. Ext. <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" [id]="'numExt_'+$index"
@@ -252,17 +252,14 @@
                     <div class="invalid-feedback">Requerido.</div>
                   </div>
 
-                  <!-- ── Número Interior ── -->
                   <div class="col-md-2">
                     <label [for]="'numInt_'+$index" class="form-label">Núm. Int.</label>
                     <input type="text" class="form-control" [id]="'numInt_'+$index"
                            formControlName="numeroInterior" placeholder="Depto 3B">
                   </div>
 
-                </div><!-- /row -->
-              </div><!-- /formGroupName -->
-            }
-          </div><!-- /formArrayName -->
+                </div></div>}
+          </div>```
 
           <!-- Error general -->
           @if (mensajeError) {

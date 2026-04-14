@@ -9,6 +9,9 @@ import { UsuarioModel } from "../../Interfaces/Usuarios/UsuarioModel";
 import { UsuarioService } from "../../Services/usuario.service";
 import { catalogoService } from "../../Services/catalogo.service";
 import { RolModel } from "../../Interfaces/Catalogos/RolModel";
+import { PaisModel } from "../../Interfaces/Catalogos/PaisModel";
+import { EstadoModel } from "../../Interfaces/Catalogos/EstadoModel";
+import { MunicipioModel } from "../../Interfaces/Catalogos/MunicipioModel";
 import { ColoniaModel } from "../../Interfaces/Catalogos/ColoniaModel";
 import { DireccionModel } from "../../Interfaces/Direccion/DireccionModel";
 import {
@@ -28,11 +31,15 @@ export class FormComponent implements OnInit, OnDestroy {
 
     public usuario: UsuarioModel | undefined;
     roles: RolModel[] = [];
+    paises: PaisModel[] = []; // Guardaremos los países a nivel global
     mensajeError: string = '';
     cargando: boolean = true;
 
     cpBuscando: boolean[] = [false];
     cpError: string[] = [''];
+
+    // Variable para guardar la URL de previsualización de la imagen
+    imagenPreviewUrl: string | ArrayBuffer | null = null;
 
     private fb = inject(FormBuilder);
     private destroy$ = new Subject<void>();
@@ -57,7 +64,7 @@ export class FormComponent implements OnInit, OnDestroy {
         celular: [''],
         telefono: [''],
         estatus: [1],
-        imagen: [''],
+        imagen: [''], // Este control guardará la imagen en base64
         direcciones: this.fb.array([
             this.crearDireccionGroup()
         ])
@@ -69,10 +76,13 @@ export class FormComponent implements OnInit, OnDestroy {
             calle: ['', Validators.required],
             numeroExterior: ['', Validators.required],
             numeroInterior: [''],
-            pais: [{ value: '', disabled: true }],
-            estado: [{ value: '', disabled: true }],
-            municipio: [{ value: '', disabled: true }],
+            idPais: [null, Validators.required],
+            idEstado: [{ value: null, disabled: true }, Validators.required],
+            idMunicipio: [{ value: null, disabled: true }, Validators.required],
             idColonia: [{ value: null, disabled: true }, Validators.required],
+            // Arrays ocultos para guardar la data de la cascada de esta dirección en particular
+            _estados: [[]],
+            _municipios: [[]],
             _colonias: [[]]
         });
     }
@@ -85,78 +95,24 @@ export class FormComponent implements OnInit, OnDestroy {
         return this.direccionesArray.at(i) as FormGroup;
     }
 
-    getColoniasDir(i: number): ColoniaModel[] {
-        return this.getDireccionGroup(i).get('_colonias')?.value || [];
-    }
+    // Funciones Helper para obtener las listas en el HTML
+    getEstadosDir(i: number): EstadoModel[] { return this.getDireccionGroup(i).get('_estados')?.value || []; }
+    getMunicipiosDir(i: number): MunicipioModel[] { return this.getDireccionGroup(i).get('_municipios')?.value || []; }
+    getColoniasDir(i: number): ColoniaModel[] { return this.getDireccionGroup(i).get('_colonias')?.value || []; }
 
     ngOnInit(): void {
         this.getRoles();
-        this.suscribirCP(0); 
+        this.getPaises();
+        this.suscribirEventosDireccion(0); 
     }
 
-    private suscribirCP(index: number): void {
-        const cpControl = this.getDireccionGroup(index).get('codigoPostal')!;
-
-        cpControl.valueChanges.pipe(
-            debounceTime(500),                         
-            distinctUntilChanged(),                     
-            filter((cp: string) => /^\d{5}$/.test(cp)), 
-            switchMap((cp: string) => {
-                this.cpBuscando[index] = true;
-                this.cpError[index] = '';
-                this.limpiarCamposCP(index);
-                this.cdr.markForCheck();
-                return this.catalogoService.getByCodigoPostal(cp).pipe(
-                    takeUntil(this.destroy$)
-                );
-            }),
-            takeUntil(this.destroy$)
-        ).subscribe({
-            next: (respuesta: any) => {
-                this.cpBuscando[index] = false;
-
-                if (!respuesta?.object) {
-                    this.cpError[index] = 'Código postal no encontrado.';
-                    this.cdr.markForCheck();
-                    return;
-                }
-
-                const data = respuesta.object; 
-                const dir = this.getDireccionGroup(index);
-
-              
-                dir.get('pais')?.setValue(data.pais?.nombre ?? '');
-                dir.get('estado')?.setValue(data.estado?.nombre ?? '');
-                dir.get('municipio')?.setValue(data.municipio?.nombre ?? '');
-
-                const colonias: ColoniaModel[] = data.colonias ?? [];
-                dir.get('_colonias')?.setValue(colonias);
-                dir.get('idColonia')?.enable();
-                dir.get('idColonia')?.setValue(null);
-
-                if (colonias.length === 1) {
-                    dir.get('idColonia')?.setValue(colonias[0].idColonia);
-                }
-
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.cpBuscando[index] = false;
-                this.cpError[index] = 'Error al consultar el código postal.';
-                this.limpiarCamposCP(index);
+    getPaises(): void {
+        this.catalogoService.getPaises().pipe(takeUntil(this.destroy$)).subscribe(res => {
+            if (res.objects) {
+                this.paises = res.objects;
                 this.cdr.markForCheck();
             }
         });
-    }
-
-    private limpiarCamposCP(index: number): void {
-        const dir = this.getDireccionGroup(index);
-        dir.get('pais')?.setValue('');
-        dir.get('estado')?.setValue('');
-        dir.get('municipio')?.setValue('');
-        dir.get('_colonias')?.setValue([]);
-        dir.get('idColonia')?.setValue(null);
-        dir.get('idColonia')?.disable();
     }
 
     getRoles(): void {
@@ -176,14 +132,149 @@ export class FormComponent implements OnInit, OnDestroy {
             });
     }
 
-    // ─── Submit ───────────────────────────────────────────────────────────────
+    // Función para manejar el cambio en el input de archivo
+    onFileChange(event: any): void {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                // Actualizamos la URL de previsualización y el valor del control 'imagen'
+                this.imagenPreviewUrl = reader.result;
+                this.form.get('imagen')?.setValue(reader.result as string);
+                this.cdr.markForCheck(); // Forzamos la detección de cambios
+            };
+
+            reader.readAsDataURL(file); // Leemos el archivo como Data URL (base64)
+        } else {
+            // Si no se seleccionó archivo, limpiamos la previsualización y el control
+            this.imagenPreviewUrl = null;
+            this.form.get('imagen')?.setValue('');
+            this.cdr.markForCheck();
+        }
+    }
+
+    private suscribirEventosDireccion(index: number): void {
+        const dir = this.getDireccionGroup(index);
+
+        // 1. FLUJO A: Cuando el usuario escribe el Código Postal
+        dir.get('codigoPostal')!.valueChanges.pipe(
+            debounceTime(500),
+            distinctUntilChanged(),
+            filter((cp: string) => /^\d{5}$/.test(cp)),
+            switchMap((cp: string) => {
+                this.cpBuscando[index] = true;
+                this.cpError[index] = '';
+                this.cdr.markForCheck();
+                return this.catalogoService.getByCodigoPostal(cp).pipe(takeUntil(this.destroy$));
+            }),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: (respuesta: any) => {
+                this.cpBuscando[index] = false;
+                if (!respuesta?.object) {
+                    this.cpError[index] = 'Código postal no encontrado.';
+                    this.cdr.markForCheck();
+                    return;
+                }
+
+                const data = respuesta.object;
+                const colonias: ColoniaModel[] = data.colonias ?? [];
+
+                // Alimentamos los catálogos internos con los objetos devueltos para que el <select> los pueda mostrar
+                dir.get('_estados')?.setValue(data.estado ? [data.estado] : []);
+                dir.get('_municipios')?.setValue(data.municipio ? [data.municipio] : []);
+                dir.get('_colonias')?.setValue(colonias);
+
+                // Habilitamos los controles
+                dir.get('idEstado')?.enable({ emitEvent: false });
+                dir.get('idMunicipio')?.enable({ emitEvent: false });
+                dir.get('idColonia')?.enable({ emitEvent: false });
+
+                // Hacemos un "patchValue" con {emitEvent: false} para que NO se dispare el "FLUJO B" por accidente
+                dir.patchValue({
+                    idPais: data.pais?.idPais || null,
+                    idEstado: data.estado?.idEstado || null,
+                    idMunicipio: data.municipio?.idMunicipio || null,
+                    idColonia: colonias.length === 1 ? colonias[0].idColonia : null
+                }, { emitEvent: false });
+
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.cpBuscando[index] = false;
+                this.cpError[index] = 'Error al consultar el código postal.';
+                this.cdr.markForCheck();
+            }
+        });
+
+        // 2. FLUJO B: Cascada hacia abajo (País -> Estado -> Municipio -> Colonia -> CP)
+        
+        // Cambio de País -> Cargar Estados
+        dir.get('idPais')!.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(idPais => {
+            if (!idPais) return;
+            dir.patchValue({ idEstado: null, idMunicipio: null, idColonia: null, codigoPostal: '' }, { emitEvent: false });
+            dir.get('idEstado')?.disable({ emitEvent: false });
+            dir.get('idMunicipio')?.disable({ emitEvent: false });
+            dir.get('idColonia')?.disable({ emitEvent: false });
+            dir.get('_estados')?.setValue([]);
+
+            this.catalogoService.getEstados(idPais).pipe(takeUntil(this.destroy$)).subscribe(res => {
+                dir.get('_estados')?.setValue(res.objects || []);
+                dir.get('idEstado')?.enable({ emitEvent: false });
+                this.cdr.markForCheck();
+            });
+        });
+
+        // Cambio de Estado -> Cargar Municipios
+        dir.get('idEstado')!.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(idEstado => {
+            if (!idEstado) return;
+            dir.patchValue({ idMunicipio: null, idColonia: null, codigoPostal: '' }, { emitEvent: false });
+            dir.get('idMunicipio')?.disable({ emitEvent: false });
+            dir.get('idColonia')?.disable({ emitEvent: false });
+            dir.get('_municipios')?.setValue([]);
+
+            this.catalogoService.getMunicipios(idEstado).pipe(takeUntil(this.destroy$)).subscribe(res => {
+                dir.get('_municipios')?.setValue(res.objects || []);
+                dir.get('idMunicipio')?.enable({ emitEvent: false });
+                this.cdr.markForCheck();
+            });
+        });
+
+        // Cambio de Municipio -> Cargar Colonias
+        dir.get('idMunicipio')!.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(idMunicipio => {
+            if (!idMunicipio) return;
+            dir.patchValue({ idColonia: null, codigoPostal: '' }, { emitEvent: false });
+            dir.get('idColonia')?.disable({ emitEvent: false });
+            dir.get('_colonias')?.setValue([]);
+
+            this.catalogoService.getColonias(idMunicipio).pipe(takeUntil(this.destroy$)).subscribe(res => {
+                dir.get('_colonias')?.setValue(res.objects || []);
+                dir.get('idColonia')?.enable({ emitEvent: false });
+                this.cdr.markForCheck();
+            });
+        });
+
+        // Cambio de Colonia -> Autocompletar CP
+        dir.get('idColonia')!.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(idColonia => {
+            if (!idColonia) return;
+            const colonias = this.getColoniasDir(index);
+            const coloniaSeleccionada = colonias.find(c => c.idColonia === idColonia);
+            if (coloniaSeleccionada && coloniaSeleccionada.codigoPostal) {
+                // Rellenamos el CP sin disparar el Flujo A de nuevo
+                dir.get('codigoPostal')?.setValue(coloniaSeleccionada.codigoPostal, { emitEvent: false });
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
     public enviarDatos(): void {
         if (this.form.invalid) {
             this.form.markAllAsTouched();
             return;
         }
 
-        const fv = this.form.getRawValue(); // getRawValue incluye campos disabled
+        const fv = this.form.getRawValue();
         const rolSeleccionado = this.roles.find(r => r.idRol === +fv.idRol)!;
 
         const direcciones: DireccionModel[] = fv.direcciones.map((d: any, i: number) => {
@@ -210,7 +301,7 @@ export class FormComponent implements OnInit, OnDestroy {
             telefono: fv.telefono,
             fechaNacimiento: fv.fechaNacimiento,
             estatus: fv.estatus,
-            imagen: fv.imagen,
+            imagen: fv.imagen, // Aquí se enviará la imagen en base64
             rol: rolSeleccionado,
             direcciones
         };
@@ -221,6 +312,7 @@ export class FormComponent implements OnInit, OnDestroy {
                 next: (respuesta) => {
                     if (respuesta.correct) {
                         console.log('Usuario creado:', respuesta.object);
+                        // Aquí puedes redirigir o mostrar mensaje de éxito
                     } else {
                         this.mensajeError = respuesta.errorMessage || 'Error desconocido.';
                         this.cdr.markForCheck();
